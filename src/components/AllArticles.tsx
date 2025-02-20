@@ -2,31 +2,32 @@ import { useEffect } from "react";
 import { useState } from "react";
 import SingleArticle from "./SingleArticle";
 import { DataInterface, Result } from "../interfaces/interfaces";
+import { Row } from "react-bootstrap";
 
 const AllArticles = () => {
   const [articles, setArticles] = useState<Result[]>([]);
-  const fetchArticles = async () => {
-    try {
-      const resp = await fetch("https://api.spaceflightnewsapi.net/v4/articles/?limit=10");
-
-      if (resp.ok) {
-        const data: DataInterface = await resp.json();
-        setArticles(data.results);
-        console.log(data.results);
-      }
-    } catch (error) {
-      console.error(error);
-    }
+  const fetchArticles = () => {
+    fetch("https://api.spaceflightnewsapi.net/v4/articles/?limit=10")
+      .then((resp) => {
+        if (resp) {
+          return resp.json();
+        }
+      })
+      .then((resp: DataInterface) => {
+        setArticles(resp.results);
+        console.log(resp.results);
+      })
+      .catch((err) => console.error(err));
   };
   useEffect(() => {
     fetchArticles();
   }, []);
   return (
-    <div>
-      {articles.map((article, i) => (
-        <SingleArticle key={"article-" + i} article={article} />
+    <Row xs={4}>
+      {articles.map((article) => (
+        <SingleArticle key={article.id} article={article} />
       ))}
-    </div>
+    </Row>
   );
 };
 export default AllArticles;
